@@ -1,11 +1,11 @@
-document.addEventListener("DOMContentLoaded", loadTodos);
+document.addEventListener("DOMContentLoaded", loadTodosFromStorage);
 
 const addButton = document.getElementById('addNewTodos')
 /** Todo 추가 버튼 클릭 */
 addButton.onclick = function addTodo() {
 
-    const Value = prompt('할 일을 추가하세요:');
-    const inputValue = Value.trim();
+    const value = prompt('할 일을 추가하세요:');
+    const inputValue = value.trim();
 
     if (inputValue === '') {
         alert('장난?');
@@ -13,24 +13,35 @@ addButton.onclick = function addTodo() {
     }
 
     const li = createTodoElement(inputValue);
-
     document.getElementById('todoList').appendChild(li);
 
     // Save to local storage
-    saveTodo(inputValue);
-    
+    saveTodoInLocalStorage(inputValue);
 }
 
 /** Todo 추가 */
-function createTodoElement(value) {
+function createTodoElement(value, comp = false) {
     const li = document.createElement('li');
-    
+            
     /** Todo 이름 생성 */
     const taskName =  document.createElement('div');
     taskName.classList.add('taskName');
     taskName.textContent = value;
+    if(comp){
+        taskName.classList.add('lineThrough');
+    }
 
-    /** Todo 삭제 기능 추가 */ 
+    /**checkbox 추가 */
+    const checkBox = document.createElement('input');
+    checkBox.classList.add('checkbox');
+    checkBox.type = 'checkbox';
+    checkBox.checked = comp;
+    checkBox.onchange = function(){
+        taskName.classList.toggle('lineThrough',checkBox.checked);
+        checkboxDataInStorage(value, checkBox.checked)
+    };
+    
+    /** Todo 삭제 버튼 추가 */ 
     const deleteBtn = document.createElement('button');
     deleteBtn.classList.add("delete");
     deleteBtn.textContent = 'Delete';
@@ -39,7 +50,7 @@ function createTodoElement(value) {
         removeTodoFromStorage(value);
     };
 
-    /** Todo 편집 기능 추가 */ 
+    /** Todo 편집 버튼 추가 */ 
     const editBtn = document.createElement('button');
     editBtn.classList.add('edit');
     editBtn.textContent ='Edit';
@@ -54,35 +65,28 @@ function createTodoElement(value) {
         }
     };
 
-    /**checkbox 추가 */
-    const checkBox = document.createElement('input');
-    checkBox.classList.add('checkbox');
-    checkBox.type = 'checkbox';
-    checkBox.focus = function(){
-        taskName.style['text-decoration'] = 'line-through';
-    };
-
     li.appendChild(taskName);
+    li.appendChild(checkBox);
     li.appendChild(editBtn);
     li.appendChild(deleteBtn);    
-    li.appendChild(checkBox);
     
     return li;
 }
 
 /** local storage에 todo 저장 */
-function saveTodo(todo) {
+function saveTodoInLocalStorage(todo, comp = false) {
     let todos;
     if (localStorage.getItem('todos') === null) {
         todos = [];
     } else {
         todos = JSON.parse(localStorage.getItem('todos'));
     }
-    todos.push(todo);
+    todos.push({text:todo, completed:comp});
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
-function loadTodos() {
+/** local storage에서 data load */
+function loadTodosFromStorage() {
     let todos;
     if (localStorage.getItem('todos') === null) {
         todos = [];
@@ -90,11 +94,12 @@ function loadTodos() {
         todos = JSON.parse(localStorage.getItem('todos'));
     }
 
-    todos.forEach(function(todo) {
-        const li = createTodoElement(todo);
+    todos.forEach(function(todoObj) {
+        const li = createTodoElement(todoObj.text, todoObj.completed);
         document.getElementById('todoList').appendChild(li);
     });
 }
+
 
 /** local storage에서 todo 제거 */
 function removeTodoFromStorage(todo) {
@@ -114,4 +119,26 @@ function updateTodoInStorage(oldValue, newValue) {
       todos[index] = newValue;
   }
   localStorage.setItem('todos', JSON.stringify(todos));
+}
+
+/** local storage에 checkbox data 저장 */
+function saveCheckboxInStorage(value){
+    if (localStorage.getItem('checkboxs') === null) {
+        checkboxs = [];
+    } else {
+        checkboxs = JSON.parse(localStorage.getItem('checkboxs'));
+    }
+    checkboxs.push(value);
+    localStorage.setItem('todos', JSON.stringify(todos));
+    const checkboxs = false;
+}
+
+/** local storage에 checkbox data 저장 */
+function checkboxDataInStorage(todo, completed) {
+    const todos = JSON.parse(localStorage.getItem('todos'));
+    const todoObj = todos.find(t => t.text === todo);
+    if (todoObj) {
+        todoObj.completed = completed;
+    }
+    localStorage.setItem('todos', JSON.stringify(todos));
 }
