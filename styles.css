@@ -52,6 +52,8 @@ body {
 }
 
 #todoList>li {
+  margin: 20px;
+  margin-left: 0px;
   padding: 20px;
   display: flex;
   position: relative;
@@ -63,7 +65,7 @@ body {
 
 #todoList >li .checkbox{
   position: absolute;
-  left: 10px;  
+  left: 20px;  
 }
 
 #todoList >li .taskName{
