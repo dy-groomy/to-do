@@ -45,7 +45,38 @@ body {
   top: 70px;
 }
 
+#todoList {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
 
-button {
-  margin-left: 10px;
+#todoList>li {
+  padding: 20px;
+  display: flex;
+  position: relative;
+  background-color: rgba(240,248,255,0.7);
+  width: 100%;
+  align-items: center;
+  height: 50px;  
+}
+
+#todoList >li .checkbox{
+  position: absolute;
+  left: 10px;  
+}
+
+#todoList >li .taskName{
+  position: absolute;
+  left: 50px;  
+}
+
+#todoList >li .edit{
+  position: absolute;
+  right: 100px;  
+}
+
+#todoList >li .delete{
+  position: absolute;
+  right: 30px;  
 }
