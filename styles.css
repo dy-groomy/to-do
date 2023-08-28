@@ -25,7 +25,7 @@ body {
   color:white;  
 }
 
-.addNewTodos {
+#addNewTodos {
   padding: 20px;
   right: 20px;
   background-color: rgba(0,0,0,0);
@@ -47,8 +47,8 @@ body {
 
 #todoList {
   display: flex;
-  flex-direction: row;
-  width: 100%;
+  flex-direction: column;
+  width: 97%;
 }
 
 #todoList>li {
