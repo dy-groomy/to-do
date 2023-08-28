@@ -11,19 +11,22 @@ addButton.onclick = function addTodo() {
         alert('장난?');
         return;
     }
+    const id = Date.now();
 
-    const li = createTodoElement(inputValue);
+    const li = createTodoElement(inputValue,id);
     document.getElementById('todoList').appendChild(li);
 
     // Save to local storage
-    saveTodoInStorage(inputValue);
+    saveTodoInStorage(inputValue,id);
 }
 
 
 
 /** Todo 추가 */
-function createTodoElement(value, comp = false) {
+function createTodoElement(value, id ,comp = false) {
     const li = document.createElement('li');
+
+    const identifier = id;
             
     /** Todo 이름 생성 */
     const taskName =  document.createElement('div');
@@ -40,7 +43,7 @@ function createTodoElement(value, comp = false) {
     checkBox.checked = comp;
     checkBox.onchange = function(){
         taskName.classList.toggle('lineThrough',checkBox.checked);
-        saveCheckboxDataInStorage(value, checkBox.checked)
+        saveCheckboxDataInStorage(identifier, checkBox.checked)
     };
     
     /** Todo 삭제 버튼 추가 */ 
@@ -49,7 +52,7 @@ function createTodoElement(value, comp = false) {
     deleteBtn.textContent = 'Delete';
     deleteBtn.onclick = function() {
         li.remove();
-        removeTodoFromStorage(value);
+        removeTodoFromStorage(identifier);
     };
 
     /** Todo 편집 버튼 추가 */ 
@@ -63,7 +66,7 @@ function createTodoElement(value, comp = false) {
             const oldValue = taskName.textContent;
             taskName.textContent = newValue.trim();
             
-            updateTodoInStorage(oldValue, newValue.trim());
+            updateTodoInStorage(identifier, newValue.trim());
         }
     };
 
@@ -75,15 +78,20 @@ function createTodoElement(value, comp = false) {
     return li;
 }
 
-/** local storage에 todo 저장 */
-function saveTodoInStorage(todo, comp = false) {
+/**
+ * local storage에 todo 저장
+ * @param {*} todo @type-[string] 할일 목록
+ * @param {*} id @type-[Date] 식별자
+ * @param {*} comp @type-[bool] 체크박스 여부
+ */
+function saveTodoInStorage(todo, id, comp = false) {
     let todos;
     if (localStorage.getItem('todos') === null) {
         todos = [];
     } else {
         todos = JSON.parse(localStorage.getItem('todos'));
     }
-    todos.push({text:todo, completed:comp});
+    todos.push({text:todo, identifier: id, completed: comp});
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
@@ -97,32 +105,43 @@ function loadTodosFromStorage() {
     }
 
     todos.forEach(function(todoObj) {
-        const li = createTodoElement(todoObj.text, todoObj.completed);
+        const li = createTodoElement(todoObj.text, todoObj.identifier,todoObj.completed);
         document.getElementById('todoList').appendChild(li);
     });
 }
 
 
-/** local storage에서 todo 제거 */
-function removeTodoFromStorage(todoText) {
-    const todos = JSON.parse(localStorage.getItem('todos')).filter(t=>t.text!==todoText);
+/**
+ * local storage에서 todo 제거
+ * @param {*} id 
+ */
+function removeTodoFromStorage(id) {
+    const todos = JSON.parse(localStorage.getItem('todos')).filter(t=>t.identifier!==id);
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
-/** local storage에 있는 todo 편집 */
-function updateTodoInStorage(oldValue, newValue) {
+/**
+ * local storage에 있는 todo 편집
+ * @param {*} id @type-[Date] 식별자
+ * @param {*} newValue @type[string] 할일 목록 변경사항
+ */
+function updateTodoInStorage(id, newValue) {
   const todos = JSON.parse(localStorage.getItem('todos'));
-  const todoObj = todos.find(t=>t.text==oldValue);
+  const todoObj = todos.find(t=>t.identifier==id);
   if (todoObj) {    
     todoObj.text = newValue;
   }
   localStorage.setItem('todos', JSON.stringify(todos));
 }
 
-/** local storage에 checkbox data 저장 */
-function saveCheckboxDataInStorage(todo, completed) {
+/**
+ * local storage에 checkbox data 저장
+ * @param {*} id @type-[Date] 식별자
+ * @param {*} comp @type-[bool] 체크박스 여부
+ */
+function saveCheckboxDataInStorage(id, completed) {
     const todos = JSON.parse(localStorage.getItem('todos'));
-    const todoObj = todos.find(t => t.text === todo);
+    const todoObj = todos.find(t => t.identifier === id);
     if (todoObj) {
         todoObj.completed = completed;
     }
