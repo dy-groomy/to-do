@@ -1,6 +1,9 @@
 document.addEventListener("DOMContentLoaded", loadTodosFromStorage);
 
 const addButton = document.getElementById('addNewTodos')
+let storageIndex = loadIndex();
+
+
 /** Todo 추가 버튼 클릭 */
 addButton.onclick = function addTodo() {
 
@@ -11,22 +14,22 @@ addButton.onclick = function addTodo() {
         alert('장난?');
         return;
     }
-    const id = Date.now();
+    let id = storageIndex;
 
     const li = createTodoElement(inputValue,id);
     document.getElementById('todoList').appendChild(li);
 
     // Save to local storage
     saveTodoInStorage(inputValue,id);
+    storageIndex++;
 }
 
 
-
 /** Todo 추가 */
-function createTodoElement(value, id ,comp = false) {
+function createTodoElement(value, index ,comp = false) {
     const li = document.createElement('li');
 
-    const identifier = id;
+    const identifier = index;
             
     /** Todo 이름 생성 */
     const taskName =  document.createElement('div');
@@ -91,7 +94,7 @@ function saveTodoInStorage(todo, id, comp = false) {
     } else {
         todos = JSON.parse(localStorage.getItem('todos'));
     }
-    todos.push({text:todo, identifier: id, completed: comp});
+    todos.push({text:todo, index: id, completed: comp});
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
@@ -105,29 +108,41 @@ function loadTodosFromStorage() {
     }
 
     todos.forEach(function(todoObj) {
-        const li = createTodoElement(todoObj.text, todoObj.identifier,todoObj.completed);
+        const li = createTodoElement(todoObj.text, todoObj.index,todoObj.completed);
         document.getElementById('todoList').appendChild(li);
     });
 }
 
 
+function loadIndex(){
+    let id;
+    let todos = JSON.parse(localStorage.getItem('todos'));
+    if(localStorage.getItem('todos') === null){
+        id = 1;
+    }
+    else{
+        id = todos.at(-1).index+1;
+    }
+    return id;
+}
+
 /**
  * local storage에서 todo 제거
- * @param {*} id 
+ * @param {*} id @type-[number] 식별자
  */
 function removeTodoFromStorage(id) {
-    const todos = JSON.parse(localStorage.getItem('todos')).filter(t=>t.identifier!==id);
+    const todos = JSON.parse(localStorage.getItem('todos')).filter(t=>t.index!==id);
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
 /**
  * local storage에 있는 todo 편집
- * @param {*} id @type-[Date] 식별자
+ * @param {*} id @type-[number] 식별자
  * @param {*} newValue @type[string] 할일 목록 변경사항
  */
 function updateTodoInStorage(id, newValue) {
   const todos = JSON.parse(localStorage.getItem('todos'));
-  const todoObj = todos.find(t=>t.identifier==id);
+  const todoObj = todos.find(t=>t.index==id);
   if (todoObj) {    
     todoObj.text = newValue;
   }
@@ -136,12 +151,12 @@ function updateTodoInStorage(id, newValue) {
 
 /**
  * local storage에 checkbox data 저장
- * @param {*} id @type-[Date] 식별자
+ * @param {*} id @type-[number] 식별자
  * @param {*} comp @type-[bool] 체크박스 여부
  */
 function saveCheckboxDataInStorage(id, completed) {
     const todos = JSON.parse(localStorage.getItem('todos'));
-    const todoObj = todos.find(t => t.identifier === id);
+    const todoObj = todos.find(t => t.index === id);
     if (todoObj) {
         todoObj.completed = completed;
     }
