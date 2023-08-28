@@ -16,7 +16,7 @@ addButton.onclick = function addTodo() {
     document.getElementById('todoList').appendChild(li);
 
     // Save to local storage
-    saveTodoInLocalStorage(inputValue);
+    saveTodoInStorage(inputValue);
 }
 
 /** Todo 추가 */
@@ -38,7 +38,7 @@ function createTodoElement(value, comp = false) {
     checkBox.checked = comp;
     checkBox.onchange = function(){
         taskName.classList.toggle('lineThrough',checkBox.checked);
-        checkboxDataInStorage(value, checkBox.checked)
+        saveCheckboxDataInStorage(value, checkBox.checked)
     };
     
     /** Todo 삭제 버튼 추가 */ 
@@ -74,7 +74,7 @@ function createTodoElement(value, comp = false) {
 }
 
 /** local storage에 todo 저장 */
-function saveTodoInLocalStorage(todo, comp = false) {
+function saveTodoInStorage(todo, comp = false) {
     let todos;
     if (localStorage.getItem('todos') === null) {
         todos = [];
@@ -102,39 +102,23 @@ function loadTodosFromStorage() {
 
 
 /** local storage에서 todo 제거 */
-function removeTodoFromStorage(todo) {
-    const todos = JSON.parse(localStorage.getItem('todos'));
-    const index = todos.indexOf(todo);
-    if (index !== -1) {
-        todos.splice(index, 1);
-    }
+function removeTodoFromStorage(todoText) {
+    const todos = JSON.parse(localStorage.getItem('todos')).filter(t=>t.text!==todoText);
     localStorage.setItem('todos', JSON.stringify(todos));
 }
 
 /** local storage에 있는 todo 편집 */
 function updateTodoInStorage(oldValue, newValue) {
   const todos = JSON.parse(localStorage.getItem('todos'));
-  const index = todos.indexOf(oldValue);
-  if (index !== -1) {
-      todos[index] = newValue;
+  const todoObj = todos.find(t=>t.text==oldValue);
+  if (todoObj) {    
+    todoObj.text = newValue;
   }
   localStorage.setItem('todos', JSON.stringify(todos));
 }
 
 /** local storage에 checkbox data 저장 */
-function saveCheckboxInStorage(value){
-    if (localStorage.getItem('checkboxs') === null) {
-        checkboxs = [];
-    } else {
-        checkboxs = JSON.parse(localStorage.getItem('checkboxs'));
-    }
-    checkboxs.push(value);
-    localStorage.setItem('todos', JSON.stringify(todos));
-    const checkboxs = false;
-}
-
-/** local storage에 checkbox data 저장 */
-function checkboxDataInStorage(todo, completed) {
+function saveCheckboxDataInStorage(todo, completed) {
     const todos = JSON.parse(localStorage.getItem('todos'));
     const todoObj = todos.find(t => t.text === todo);
     if (todoObj) {

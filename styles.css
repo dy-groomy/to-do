@@ -48,7 +48,7 @@ body {
 #todoList {
   display: flex;
   flex-direction: column;
-  width: 97%;
+  width: 85%;
 }
 
 #todoList>li {
