@@ -86,3 +86,7 @@ body {
   position: absolute;
   right: 30px;  
 }
+
+.invisible{
+  display: none;
+}
