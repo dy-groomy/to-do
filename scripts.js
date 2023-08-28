@@ -19,6 +19,8 @@ addButton.onclick = function addTodo() {
     saveTodoInStorage(inputValue);
 }
 
+
+
 /** Todo 추가 */
 function createTodoElement(value, comp = false) {
     const li = document.createElement('li');
