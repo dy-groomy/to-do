@@ -24,11 +24,7 @@ addButton.onclick = function addTodo() {
 /** Todo 추가 */
 function createTodoElement(value) {
     const li = document.createElement('li');
-
-    const checkBox = document.createElement('input');
-    checkBox.classList.add('checkbox');
-
-
+    
     /** Todo 이름 생성 */
     const taskName =  document.createElement('div');
     taskName.classList.add('taskName');
@@ -48,18 +44,28 @@ function createTodoElement(value) {
     editBtn.classList.add('edit');
     editBtn.textContent ='Edit';
     editBtn.onclick = function() {
-      const newValue = prompt('Edit your task:', taskName.textContent);
-      if (newValue && newValue.trim() !== '') {
-          const oldValue = taskName.textContent;
-          taskName.textContent = newValue.trim();
-          
-          updateTodoInStorage(oldValue, newValue.trim());
-      }
+        const newValue = prompt('Edit your task:', taskName.textContent);
+        
+        if (newValue && newValue.trim() !== '') {
+            const oldValue = taskName.textContent;
+            taskName.textContent = newValue.trim();
+            
+            updateTodoInStorage(oldValue, newValue.trim());
+        }
+    };
+
+    /**checkbox 추가 */
+    const checkBox = document.createElement('input');
+    checkBox.classList.add('checkbox');
+    checkBox.type = 'checkbox';
+    checkBox.focus = function(){
+        taskName.style['text-decoration'] = 'line-through';
     };
 
     li.appendChild(taskName);
     li.appendChild(editBtn);
-    li.appendChild(deleteBtn);
+    li.appendChild(deleteBtn);    
+    li.appendChild(checkBox);
     
     return li;
 }
